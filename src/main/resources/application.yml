@@ -1,6 +1,5 @@
 server:
-  port: 8082
-
+  port: 8080
 
 spring:
   config:
@@ -27,23 +26,52 @@ spring:
 
 ---
 server:
-  port: 8082
+  port: 8080
 
 spring:
+
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
   datasource:
     url: "jdbc:mysql://localhost/alerting"
     username: "root"
-    password: "213621" #"Abcd1234!"
+    password: ${mysql.password} #"Abcd1234!"
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
-        show_sql: true # ??????? ??? SQL? ????
-        format_sql: true # ??????? ??? SQL? ?? ?? ??
+        show_sql: true
+        format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
-        use_sql_comments: true # ??? ??? ? ??? ?? ????
+        use_sql_comments: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+  redis:
+    host: localhost
+    port: 6379
+    password: ${redis.password}
+
+recaptcha:
+  key:
+    site: ${recaptcha.key.site}
+    secret: ${recaptcha.key.secret}
+
+jwt:
+  secret: ${jwt.secret}
+
+logging:
+  level:
+    org.springframework.security: DEBUG

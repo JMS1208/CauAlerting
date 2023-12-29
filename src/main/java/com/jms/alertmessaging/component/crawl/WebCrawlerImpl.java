@@ -1,6 +1,6 @@
 package com.jms.alertmessaging.component.crawl;
 
-import com.jms.alertmessaging.entity.Post;
+import com.jms.alertmessaging.entity.board.Board;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,7 +22,7 @@ public class WebCrawlerImpl implements WebCrawler {
     public static final Logger logger = LoggerFactory.getLogger(WebCrawlerImpl.class);
 
     @Override
-    public Post crawlPost(int postNumber) throws IOException {
+    public Board crawlPost(int postNumber) throws IOException {
 
         String http = "http";
         String https = "https";
@@ -35,21 +35,21 @@ public class WebCrawlerImpl implements WebCrawler {
         Element authorElement = doc.select("div.header > div > span:nth-child(3)").first();
 
         String title = titleElement.text();
-        String author = authorElement.text();
+        String writer = authorElement.text();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date = LocalDate.parse(dateElement.text(), formatter);
+        LocalDate postAt = LocalDate.parse(dateElement.text(), formatter);
 
-        return Post.builder()
+        return Board.builder()
                 .postNumber(postNumber)
                 .title(title)
-                .author(author)
-                .date(date)
+                .writer(writer)
+                .postAt(postAt)
                 .link(https + url)
                 .build();
     }
 
     @Override
-    public List<Post> crawlRecentPostList() throws IOException {
+    public List<Board> crawlRecentPostList() throws IOException {
         //얘는 디비 거칠 필요 없음 그냥 바로 보내줌
         String http = "http";
         String https = "https";
@@ -59,12 +59,12 @@ public class WebCrawlerImpl implements WebCrawler {
 
         Elements rows = doc.select("table.table-basic tbody tr");
 
-        List<Post> postList = new ArrayList<>();
+        List<Board> boardList = new ArrayList<>();
 
         for (Element row : rows) {
             // 각 행에서 원하는 정보 추출
             String title = row.select("td.aleft a").text();
-            String author = row.select("td.pc-only:nth-child(4)").text();
+            String writer = row.select("td.pc-only:nth-child(4)").text();
             String dateStr = row.select("td.pc-only:nth-child(5)").text();
             String link = row.select("td.aleft a").attr("href");
 
@@ -80,21 +80,21 @@ public class WebCrawlerImpl implements WebCrawler {
 
             //날짜 추출
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-            LocalDate date = LocalDate.parse(dateStr, formatter);
+            LocalDate postAt = LocalDate.parse(dateStr, formatter);
 
-            Post post = Post.builder()
-                    .author(author)
+            Board board = Board.builder()
+                    .writer(writer)
                     .postNumber(postNumber)
                     .link(https + link)
                     .title(title)
-                    .date(date)
+                    .postAt(postAt)
                     .build();
 
-            postList.add(post);
+            boardList.add(board);
         }
 
-        postList.sort(Post::compareTo);
+        boardList.sort(Board::compareTo);
 
-        return postList;
+        return boardList;
     }
 }
