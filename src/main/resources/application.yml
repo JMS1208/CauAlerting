@@ -1,44 +1,32 @@
 server:
-  port: 8080
+  port: 443
+  ssl:
+    key-store: /Users/minseok95/ourhomeassignment/keystore.p12
+    key-store-password: ${ssl.password}
+    keyStoreType: PKCS12
+    keyAlias: myalias
+  servlet:
+    cookie:
+      same-site: None
+      secure: true
 
 spring:
-  config:
-    activate:
-      on-profile: local
-  datasource:
-    url: "jdbc:h2:mem:alerting;MODE=MYSQL;NON_KEYWORDS=USER"
-    username: "sa"
-    password: ""
-    driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
-
----
-server:
-  port: 8080
-
-spring:
+  sql:
+    init:
+      mode: always
 
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
+
   datasource:
     url: "jdbc:mysql://localhost/alerting"
     username: "root"
     password: ${mysql.password} #"Abcd1234!"
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
     properties:
@@ -47,6 +35,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
         use_sql_comments: true
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -59,6 +48,146 @@ spring:
           timeout: 5000
           starttls:
             enable: true
+
+  redis:
+    host: localhost
+    port: 6379
+    password: ${redis.password}
+
+recaptcha:
+  key:
+    site: ${recaptcha.key.site}
+    secret: ${recaptcha.key.secret}
+
+jwt:
+  secret: ${jwt.secret}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+---
+server:
+  port: 443
+  ssl:
+    key-store: /Users/minseok95/ourhomeassignment/keystore.p12
+    key-store-password: ${ssl.password}
+    keyStoreType: PKCS12
+    keyAlias: myalias
+  servlet:
+    cookie:
+      same-site: None
+      secure: true
+
+spring:
+  sql:
+    init:
+      mode: never
+
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: "jdbc:mysql://localhost/alerting"
+    username: "root"
+    password: ${mysql.password} #"Abcd1234!"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        use_sql_comments: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
+  redis:
+    host: localhost
+    port: 6379
+    password: ${redis.password}
+
+recaptcha:
+  key:
+    site: ${recaptcha.key.site}
+    secret: ${recaptcha.key.secret}
+
+jwt:
+  secret: ${jwt.secret}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+---
+
+server:
+  port: 443
+  ssl:
+    key-store: /Users/minseok95/ourhomeassignment/keystore.p12
+    key-store-password: ${ssl.password}
+    keyStoreType: PKCS12
+    keyAlias: myalias
+  servlet:
+    cookie:
+      same-site: None
+      secure: true
+
+spring:
+  sql:
+    init:
+      mode: always
+
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL"
+    username: "sa"
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+        use_sql_comments: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
   redis:
     host: localhost
     port: 6379

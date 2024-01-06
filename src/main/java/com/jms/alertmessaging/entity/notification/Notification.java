@@ -25,5 +25,6 @@ public class Notification {
     private Board board;
 
     @CreationTimestamp
+    @Column(name = "sent_at")
     private LocalDateTime sentAt;
 }

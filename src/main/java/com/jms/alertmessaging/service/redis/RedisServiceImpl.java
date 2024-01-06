@@ -1,5 +1,6 @@
 package com.jms.alertmessaging.service.redis;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -10,14 +11,10 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class RedisServiceImpl implements RedisService{
 
-    public RedisTemplate<String, String> redisTemplate;
-
-    @Autowired
-    public RedisServiceImpl(RedisTemplate<String, String> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+    private final RedisTemplate<String, String> redisTemplate;
 
     //키 있으면 값 덮어씌움
     @Override

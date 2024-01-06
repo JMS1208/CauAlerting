@@ -6,10 +6,9 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Setter
-@Getter
-@ToString
-@Entity
+@Data
+@Entity(name = "board")
+@ToString(exclude = "department")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,14 +18,24 @@ public class Board implements Comparable<Board> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @Column(name = "post_number")
     public int postNumber;
+
+    @Column(name = "title")
     public String title;
+
+    @Column(name = "writer")
     public String writer;
+
+    @Column(name = "link")
     public String link;
+
+    @Column(name = "post_at")
     public LocalDate postAt;
 
 

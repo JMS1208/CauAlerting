@@ -1,10 +1,12 @@
 package com.jms.alertmessaging.entity.student;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.enrollment.Enrollment;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,22 +28,24 @@ public class Student implements UserDetails {
     private long id;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     public LocalDateTime createdAt;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     //API 요청으로 들어올 수는 있어도 응답으로 들어가진 않는다는 것
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
 
     @Builder.Default
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<String> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "student")
     private Set<Enrollment> enrollments = new HashSet<>();
 
     @Override
@@ -78,4 +82,5 @@ public class Student implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

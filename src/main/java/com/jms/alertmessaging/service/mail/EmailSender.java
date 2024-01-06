@@ -1,5 +1,9 @@
 package com.jms.alertmessaging.service.mail;
 
+import java.util.List;
+
 public interface EmailSender {
-    public void sendEmail(String to, String subject, String content);
+    void sendEmailToPerson(String address, String title, String content);
+
+    void sendEmailToPeople(List<String> addresses, String title, String content);
 }

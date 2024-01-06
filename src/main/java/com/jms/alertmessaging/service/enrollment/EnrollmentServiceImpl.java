@@ -4,6 +4,7 @@ import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.enrollment.Enrollment;
 import com.jms.alertmessaging.entity.student.Student;
 import com.jms.alertmessaging.repository.enrollment.EnrollmentJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class EnrollmentServiceImpl implements EnrollmentService {
 
     private final Logger logger = LoggerFactory.getLogger(EnrollmentServiceImpl.class);
     private final EnrollmentJpaRepository enrollmentJpaRepository;
-
-    @Autowired
-    public EnrollmentServiceImpl(EnrollmentJpaRepository enrollmentJpaRepository) {
-        this.enrollmentJpaRepository = enrollmentJpaRepository;
-    }
 
     @Override
     public void saveEnrollments(Student student, Set<Department> departments) {
