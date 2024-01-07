@@ -3,6 +3,7 @@ package com.jms.alertmessaging.entity.board;
 import com.jms.alertmessaging.entity.department.Department;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 
@@ -19,6 +20,7 @@ public class Board implements Comparable<Board> {
     private long id;
 
 
+    @BatchSize(size = 100)
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;

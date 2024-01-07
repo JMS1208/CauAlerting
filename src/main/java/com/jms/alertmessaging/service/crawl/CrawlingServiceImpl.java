@@ -21,21 +21,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CrawlingServiceImpl implements CrawlingService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CrawlingServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrawlingServiceImpl.class);
 
     private final ApplicationContext context;
 
     @Override
     public List<Board> crawlFrom(Department department, Integer postNum) throws IOException {
 
-        WebCrawler webCrawler = switch ((int) department.getId()) {
+        WebCrawler webCrawler = getWebCrawler(department);
+
+        return webCrawler.crawlFrom(department, postNum);
+    }
+
+    //[important] 새 학부 추가할 때마다 이곳 조정해주어야한다
+    private WebCrawler getWebCrawler(Department department) {
+        return switch ((int) department.getId()) {
             case 1 -> context.getBean(SoftwareDepWebCrawler.class);
             case 2 -> context.getBean(BizAdminDepCrawler.class);
             case 3 -> context.getBean(NurseDepWebCrawler.class);
             default -> throw new IllegalArgumentException("Invalid department ID");
         };
-
-        return webCrawler.crawlFrom(department, postNum);
     }
 
 }

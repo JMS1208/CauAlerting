@@ -26,7 +26,7 @@ public final class SoftwareDepWebCrawler implements WebCrawler {
     @Override
     public List<Board> crawlFrom(Department department, Integer postNum) throws IOException {
 
-        int postNumber = Objects.isNull(postNum) ? softInitPostNumber : postNum;
+        int postNumber = Objects.isNull(postNum) ? SOFT_INIT_POST_NUM : postNum;
 
         String http = "http";
         String https = "https";

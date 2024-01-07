@@ -48,24 +48,30 @@ public class AlertingService {
 
     //주기적으로 크롤링해서 이메일 보내고 디비에 저장하기
     //오전 8시 ~ 오전 12시까지만 크롤링
-    @Scheduled(cron = "0 0 8-24 * * *")
+//    @Scheduled(cron = "0 0 8-23 * * *")
+    @Scheduled(fixedRate = 30000)
     @Transactional
     public void crawlingAndSendEmail() {
         try {
-
             //학부별로 최근에 크롤링한 게시글
+
             List<Board> recentBoards = queryFactory
                     .selectFrom(qBoard)
+                    .leftJoin(qBoard.department).fetchJoin() // 페치 조인 사용
                     .where(qBoard.postNumber.in(
                             JPAExpressions
                                     .select(qBoardSub.postNumber.max())
+                                    .from(qBoardSub)
                                     .groupBy(qBoardSub.department)
                                     .having(qBoardSub.department.id.eq(qBoard.department.id))
-                            ))
+                    ))
                     .fetch();
+
+            LOGGER.info("[최근 크롤링한 학부 수] : {}", recentBoards.size());
 
             //모든 학부
             List<Department> departments = departmentJpaRepository.findAll();
+
 
             //학부별로 최근에 크롤링한 게시글
             Map<Long, Board> recentBoardsMap = new HashMap<>();
@@ -83,11 +89,18 @@ public class AlertingService {
 
                 //이 학부에 대해서 최근에 크롤링한 게시글이 있다면
                 if(recentBoardsMap.containsKey(department.getId())) {
-                    postNum = recentBoardsMap.get(department.getId()).postNumber;
+                    LOGGER.info("[{}] 최근 크롤링한 것 있음", department.getName());
+                    postNum = recentBoardsMap.get(department.getId()).postNumber+1;
                 }
+
+                LOGGER.info("[포스트 넘버] {}", postNum);
 
                 //새로 크롤링해 온 게시글들
                 List<Board> crawledBoards = crawlingService.crawlFrom(department, postNum);
+
+                LOGGER.info("[크롤링 새로해 온 것] 학부: {}, 개수: {}", department.getName(), crawledBoards.size());
+
+                if(crawledBoards.isEmpty()) continue;
 
                 //보낼 사람들
                 List<Student> students = queryFactory
@@ -101,7 +114,6 @@ public class AlertingService {
                 //보낼 이메일들
                 List<String> sendToEmails = students.stream().map(Student::getEmail).toList();
 
-
                 LOGGER.info("[보낼 이메일들] {}", sendToEmails);
 
                 //이메일 보내기
@@ -112,7 +124,7 @@ public class AlertingService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            emailSender.sendEmailToPerson("wjsalstjr59@gmail.com", "중앙대 알림이 오류 발생", e.toString());
         }
     }
 

@@ -17,4 +17,7 @@ INSERT INTO enrollment (student_id, department_id) VALUES (3, 1);
 INSERT INTO enrollment (student_id, department_id) VALUES (3, 2);
 INSERT INTO enrollment (student_id, department_id) VALUES (3, 3);
 
+INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES (now(), 1, 1, '링크', '제목', '작성자');
+INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES (now(), 1, 2, '링크', '제목', '작성자');
+INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES (now(), 1, 3, '링크', '제목', '작성자');
 

@@ -26,7 +26,7 @@ public final class NurseDepWebCrawler implements WebCrawler {
     @Override
     public List<Board> crawlFrom(Department department, Integer postNum) throws IOException {
 
-        int postNumber = Objects.isNull(postNum) ? nurseInitPostNumber : postNum;
+        int postNumber = Objects.isNull(postNum) ? NURSE_ADMIN_INIT_POST_NUM : postNum;
 
         String http = "http";
         String https = "https";
@@ -57,7 +57,7 @@ public final class NurseDepWebCrawler implements WebCrawler {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
             LocalDate postAt = LocalDate.parse(dateElement.text(), formatter);
 
-            LOGGER.info("[테스트] 제목: {}, 작성자: {}, 날짜: {}", title, writer, postAt);
+            LOGGER.info("[간호학부] 제목: {}, 작성자: {}, 날짜: {}", title, writer, postAt);
 
             Board board = Board.builder()
                     .postNumber(postNumber)

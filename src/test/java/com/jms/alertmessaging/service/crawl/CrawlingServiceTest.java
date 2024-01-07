@@ -3,12 +3,14 @@ package com.jms.alertmessaging.service.crawl;
 import com.jms.alertmessaging.config.TestConfig;
 import com.jms.alertmessaging.entity.board.Board;
 import com.jms.alertmessaging.entity.board.QBoard;
+import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.department.QDepartment;
 import com.jms.alertmessaging.entity.enrollment.QEnrollment;
 import com.jms.alertmessaging.entity.keyword.QKeyword;
 import com.jms.alertmessaging.entity.student.QStudent;
 import com.jms.alertmessaging.entity.student.Student;
 import com.jms.alertmessaging.repository.department.DepartmentJpaRepository;
+import com.jms.alertmessaging.repository.post.BoardJpaRepository;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.Test;
@@ -20,7 +22,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -34,6 +40,9 @@ public class CrawlingServiceTest {
     @Autowired
     private DepartmentJpaRepository departmentJpaRepository;
 
+    @Autowired
+    private BoardJpaRepository boardJpaRepository;
+
     private Logger LOGGER = LoggerFactory.getLogger(CrawlingServiceTest.class);
 
     private QEnrollment qEnrollment = QEnrollment.enrollment;
@@ -44,20 +53,30 @@ public class CrawlingServiceTest {
 
 
     @Test
-    public void getRecentBoardsTest() {
+    public void getDepartmentsList() {
+        List<Department> departments = departmentJpaRepository.findAll();
 
-//        QBoard qBoardSub = new QBoard("boardSub");
+        for(Department department: departments) {
+            LOGGER.info("테스트: {}", department.getName());
+        }
+
+//        for(int i = 0; i < 3; i++) {
+//            Board board = Board.builder()
+//                    .postAt(LocalDate.now())
+//                    .title("제목 " + i + 1 )
+//                    .writer("작성자 " + i + 1)
+//                    .link("링크 예시")
+//                    .postNumber(i+1)
+//                    .department(departments.get(i))
+//                    .build();
 //
-//        //학부별로 최근에 크롤링한 게시글
-//        List<Board> recentBoards = queryFactory
-//                .selectFrom(qBoard)
-//                .where(qBoard.postNumber.in(
-//                        JPAExpressions
-//                                .select(qBoardSub.postNumber.max())
-//                                .groupBy(qBoardSub.department)
-//                                .having(qBoardSub.department.id.eq(qBoard.department.id))
-//                ))
-//                .fetch();
+//            boardJpaRepository.save(board);
+//        }
+
+    }
+
+    @Test
+    public void getRecentBoardsTest() {
 
         QBoard qBoardSub = new QBoard("board");
 
@@ -73,10 +92,12 @@ public class CrawlingServiceTest {
                 ))
                 .fetch();
 
+        LOGGER.info("[테스트] 개수: {}", boards.size());
 
         for(Board board: boards) {
             LOGGER.info("[테스트] 학부 이름: {}, 포스트 번호: {}", board.getDepartment().getName(), board.postNumber);
         }
+
 
 
     }

@@ -8,11 +8,11 @@ import java.util.List;
 
 public sealed interface WebCrawler permits NurseDepWebCrawler, SoftwareDepWebCrawler, BizAdminDepCrawler {
 
-    int softInitPostNumber = 2812;
+    int SOFT_INIT_POST_NUM = 2812;
 
-    int bizAdminInitPostNumber = 6811;
+    int BIZ_ADMIN_INIT_POST_NUM = 6811;
 
-    int nurseInitPostNumber = 2552;
+    int NURSE_ADMIN_INIT_POST_NUM = 2552;
 
     List<Board> crawlFrom(Department department, Integer postNum) throws IOException;
 

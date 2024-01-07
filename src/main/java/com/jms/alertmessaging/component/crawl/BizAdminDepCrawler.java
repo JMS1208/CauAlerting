@@ -27,7 +27,7 @@ public final class BizAdminDepCrawler implements WebCrawler {
     @Override
     public List<Board> crawlFrom(Department department, Integer postNum) throws IOException {
 
-        int postNumber = Objects.isNull(postNum) ? bizAdminInitPostNumber : postNum;
+        int postNumber = Objects.isNull(postNum) ? BIZ_ADMIN_INIT_POST_NUM : postNum;
 
         String http = "http";
 
