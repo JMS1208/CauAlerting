@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -47,11 +48,19 @@ public class AlertingService {
     private final JPAQueryFactory queryFactory;
 
     //주기적으로 크롤링해서 이메일 보내고 디비에 저장하기
-    //오전 8시 ~ 오전 12시까지만 크롤링
-//    @Scheduled(cron = "0 0 8-23 * * *")
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 60_000)
     @Transactional
     public void crawlingAndSendEmail() {
+
+        LocalTime now = LocalTime.now();
+        LocalTime start = LocalTime.of(8,0);
+        LocalTime end = LocalTime.of(23,0);
+
+        //오전 8시 ~ 오후 11시까지만 크롤링
+        if(now.isBefore(start) || now.isAfter(end)) {
+            return;
+        }
+
         try {
             //학부별로 최근에 크롤링한 게시글
 
@@ -124,6 +133,7 @@ public class AlertingService {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             emailSender.sendEmailToPerson("wjsalstjr59@gmail.com", "중앙대 알림이 오류 발생", e.toString());
         }
     }

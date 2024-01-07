@@ -41,7 +41,7 @@ public class Student implements UserDetails {
 
 
     @Builder.Default
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
     @BatchSize(size = 100)
