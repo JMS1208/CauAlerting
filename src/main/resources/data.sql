@@ -6,7 +6,7 @@ INSERT INTO student(created_at, email, password) VALUES (now(), 'dnwnalstjr@nave
 
 INSERT INTO department(name) VALUES ('소프트웨어학부');
 INSERT INTO department(name) VALUES ('경영학부');
-INSERT INTO department(name) VALUES ('간호대학');
+INSERT INTO department(name) VALUES ('간호학과');
 
 INSERT INTO enrollment (student_id, department_id) VALUES (1, 1);
 INSERT INTO enrollment (student_id, department_id) VALUES (1, 2);

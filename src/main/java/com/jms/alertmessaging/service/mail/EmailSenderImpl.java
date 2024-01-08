@@ -5,20 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
+@Component
 public class EmailSenderImpl implements EmailSender {
-
 
     private final JavaMailSender mailSender;
 
+    @Autowired
+    public EmailSenderImpl(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     //to: 주소, subject: 제목, content: 내용
-    @Async
     @Override
     public void sendEmailToPerson(String address, String title, String content) {
         SimpleMailMessage message = new SimpleMailMessage();

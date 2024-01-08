@@ -111,6 +111,9 @@ public class AlertingService {
 
                 if(crawledBoards.isEmpty()) continue;
 
+                //새로 크롤링한 것 디비에 저장
+                boardJpaRepository.saveAll(crawledBoards);
+
                 //보낼 사람들
                 List<Student> students = queryFactory
                         .selectFrom(qStudent)
@@ -125,11 +128,11 @@ public class AlertingService {
 
                 LOGGER.info("[보낼 이메일들] {}", sendToEmails);
 
+                if(sendToEmails.isEmpty()) continue;
+
                 //이메일 보내기
                 emailSender.sendEmailToPeople(sendToEmails, department.getName() +" 새글 알림", toContent(crawledBoards));
 
-                //새로 크롤링한 것 디비에 저장
-                boardJpaRepository.saveAll(crawledBoards);
             }
 
         } catch (Exception e) {

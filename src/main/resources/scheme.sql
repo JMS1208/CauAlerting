@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `student`
 CREATE TABLE IF NOT EXISTS `department`
 (
     `id`   BIGINT       NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(50) NOT NULL,
     PRIMARY KEY (`id`)
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `enrollment`
 CREATE TABLE IF NOT EXISTS `student_roles`
 (
     `student_id` BIGINT       NOT NULL,
-    `roles`      VARCHAR(255) NOT NULL,
+    `roles`      VARCHAR(15) NOT NULL,
     FOREIGN KEY (`student_id`) REFERENCES `student` (`id`)
 );
 
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `board`
     `department_id` BIGINT       NOT NULL,
     `link`          VARCHAR(255),
     `title`         VARCHAR(255) NOT NULL,
-    `writer`        VARCHAR(255) NULL,
+    `writer`        VARCHAR(50) NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
 );
@@ -64,3 +64,8 @@ CREATE TABLE IF NOT EXISTS `notification`
     FOREIGN KEY (`board_id`) REFERENCES `board` (`id`),
     FOREIGN KEY (`student_id`) REFERENCES `student` (`id`)
 );
+
+ALTER TABLE department convert to charset utf8;
+ALTER TABLE keywords convert to charset utf8;
+ALTER TABLE board convert to charset utf8;
+ALTER TABLE notification convert to charset utf8;

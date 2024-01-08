@@ -1,7 +1,7 @@
 server:
   port: 8443
   ssl:
-    key-store: /etc/nginx/certs/keystore.p12
+    key-store: /Users/minseok95/caualerting/cau-noti.com/keystore.p12
     key-store-password: ${ssl.password}
     keyStoreType: PKCS12
     keyAlias: alerting
@@ -12,6 +12,30 @@ server:
       secure: true
 
 spring:
+  sql:
+    init:
+      mode: always
+
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: "jdbc:mysql://localhost/alerting"
+    username: "root"
+    password: ${mysql.password} #"Abcd1234!"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        use_sql_comments: true
 
   mail:
     host: smtp.gmail.com
@@ -26,30 +50,9 @@ spring:
           starttls:
             enable: true
 
-  sql:
-    init:
-      mode: never
-
-  datasource:
-    url: jdbc:mysql://cau-alerting-mysql:3306/alerting #jdbc:mysql://도커 컨테이너 이름:3306/alerting
-    username: user
-    password: ${mysql.password} #"Abcd1234!"
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        use_sql_comments: true
-
   data:
     redis:
-      host: cau-alerting-redis #도커 redis 컨테이너 이름
+      host: localhost
       port: 6379
       password: ${redis.password}
 
