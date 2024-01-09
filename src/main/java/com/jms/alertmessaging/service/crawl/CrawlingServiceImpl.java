@@ -1,9 +1,6 @@
 package com.jms.alertmessaging.service.crawl;
 
-import com.jms.alertmessaging.component.crawl.BizAdminDepCrawler;
-import com.jms.alertmessaging.component.crawl.NurseDepWebCrawler;
-import com.jms.alertmessaging.component.crawl.SoftwareDepWebCrawler;
-import com.jms.alertmessaging.component.crawl.WebCrawler;
+import com.jms.alertmessaging.component.crawl.*;
 import com.jms.alertmessaging.entity.board.Board;
 import com.jms.alertmessaging.entity.department.Department;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +23,11 @@ public class CrawlingServiceImpl implements CrawlingService {
     private final ApplicationContext context;
 
     @Override
-    public List<Board> crawlFrom(Department department, Integer postNum) throws IOException {
+    public List<Board> crawlFrom(Department department, String baseUrl, Integer postNum) throws IOException {
 
         WebCrawler webCrawler = getWebCrawler(department);
 
-        return webCrawler.crawlFrom(department, postNum);
+        return webCrawler.crawlFrom(department, baseUrl, postNum);
     }
 
     //[important] 새 학부 추가할 때마다 이곳 조정해주어야한다
@@ -39,6 +36,8 @@ public class CrawlingServiceImpl implements CrawlingService {
             case 1 -> context.getBean(SoftwareDepWebCrawler.class);
             case 2 -> context.getBean(BizAdminDepCrawler.class);
             case 3 -> context.getBean(NurseDepWebCrawler.class);
+            case 4 -> context.getBean(MachineEngDepCrawler.class);
+            case 5 -> context.getBean(ArchiDepCrawler.class);
             default -> throw new IllegalArgumentException("Invalid department ID");
         };
     }

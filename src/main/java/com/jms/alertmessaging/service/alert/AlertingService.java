@@ -49,8 +49,9 @@ public class AlertingService {
 
     private final JPAQueryFactory queryFactory;
 
+
     //주기적으로 크롤링해서 이메일 보내고 디비에 저장하기
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedRate = 120_000)
     @Transactional
     public void crawlingAndSendEmail() {
 
@@ -79,41 +80,22 @@ public class AlertingService {
                             JPAExpressions
                                     .select(qBoardSub.postNumber.max())
                                     .from(qBoardSub)
-                                    .groupBy(qBoardSub.department)
-                                    .having(qBoardSub.department.id.eq(qBoard.department.id))
+                                    .groupBy(qBoardSub.department, qBoardSub.link) // 학부와 링크 별로 그룹화
+                                    .having(qBoardSub.department.id.eq(qBoard.department.id)
+                                            .and(qBoardSub.link.eq(qBoard.link))) // 학부와 링크가 메인 쿼리의 해당 값과 일치하는 경우
                     ))
                     .fetch();
 
             LOGGER.info("[최근 크롤링한 학부 수] : {}", recentBoards.size());
 
-            //모든 학부
-            List<Department> departments = departmentJpaRepository.findAll();
-
-
-            //학부별로 최근에 크롤링한 게시글
-            Map<Long, Board> recentBoardsMap = new HashMap<>();
-
             for(Board recentBoard: recentBoards) {
-                recentBoardsMap.put(recentBoard.getDepartment().getId(), recentBoard);
-            }
 
-            //모든 학부를 크롤링할 건데, 최근에 크롤링한 게시글이 있는 것과 없는 것 구별해서
-            for(Department department: departments) {
-
-                LOGGER.info("[학부] {}", department.getName());
-                //이 학부에 대해서 최근에 크롤링한 게시글이 없다면 null
-                Integer postNum = null;
-
-                //이 학부에 대해서 최근에 크롤링한 게시글이 있다면
-                if(recentBoardsMap.containsKey(department.getId())) {
-                    LOGGER.info("[{}] 이전에 크롤링한 것 있음", department.getName());
-                    postNum = recentBoardsMap.get(department.getId()).postNumber+1;
-                }
-
-                LOGGER.info("[크롤링 시작할 포스트 넘버] {}", postNum);
+                Department department = recentBoard.getDepartment();
+                String baseUrl = recentBoard.getLink();
+                Integer postNum = recentBoard.getPostNumber()+1;
 
                 //새로 크롤링해 온 게시글들
-                List<Board> crawledBoards = crawlingService.crawlFrom(department, postNum);
+                List<Board> crawledBoards = crawlingService.crawlFrom(department, baseUrl, postNum);
 
                 LOGGER.info("[크롤링 새로해 온 것] 학부: {}, 개수: {}", department.getName(), crawledBoards.size());
 
@@ -125,6 +107,7 @@ public class AlertingService {
                 //보낼 사람들
                 List<Student> students = queryFactory
                         .selectFrom(qStudent)
+                        .leftJoin(qStudent.roles)
                         .join(qStudent.enrollments, qEnrollment)
                         .join(qEnrollment.department, qDepartment)
                         .where(qDepartment.id.eq(department.getId()))
@@ -154,7 +137,7 @@ public class AlertingService {
 
         for(Board board: boards) {
             sb.append("[ ").append(board.title).append("] \n");
-            sb.append("(").append(board.link).append(") \n\n\n");
+            sb.append("(").append(board.link).append(board.postNumber).append(") \n\n\n");
         }
 
         return sb.toString();

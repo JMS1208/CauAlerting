@@ -60,18 +60,18 @@ public class CrawlingServiceTest {
             LOGGER.info("테스트: {}", department.getName());
         }
 
-//        for(int i = 0; i < 3; i++) {
-//            Board board = Board.builder()
-//                    .postAt(LocalDate.now())
-//                    .title("제목 " + i + 1 )
-//                    .writer("작성자 " + i + 1)
-//                    .link("링크 예시")
-//                    .postNumber(i+1)
-//                    .department(departments.get(i))
-//                    .build();
-//
-//            boardJpaRepository.save(board);
-//        }
+        for(int i = 0; i < 3; i++) {
+            Board board = Board.builder()
+                    .postAt(LocalDate.now())
+                    .title("제목 " + i + 1 )
+                    .writer("작성자 " + i + 1)
+                    .link("링크 예시 " + i)
+                    .postNumber(i+1)
+                    .department(departments.get(i))
+                    .build();
+
+            boardJpaRepository.save(board);
+        }
 
     }
 
@@ -80,21 +80,21 @@ public class CrawlingServiceTest {
 
         QBoard qBoardSub = new QBoard("board");
 
-        List<Board> boards = queryFactory
+        List<Board> recentBoards = queryFactory
                 .selectFrom(qBoard)
-                .leftJoin(qBoard.department, qDepartment).fetchJoin()
+                .leftJoin(qBoard.department).fetchJoin() // 페치 조인 사용
                 .where(qBoard.postNumber.in(
                         JPAExpressions
                                 .select(qBoardSub.postNumber.max())
                                 .from(qBoardSub)
-                                .groupBy(qBoardSub.department.id)
+                                .groupBy(qBoardSub.department, qBoardSub.link)
                                 .having(qBoardSub.department.id.eq(qBoard.department.id))
                 ))
                 .fetch();
 
-        LOGGER.info("[테스트] 개수: {}", boards.size());
+        LOGGER.info("[테스트] 개수: {}", recentBoards.size());
 
-        for(Board board: boards) {
+        for(Board board: recentBoards) {
             LOGGER.info("[테스트] 학부 이름: {}, 포스트 번호: {}", board.getDepartment().getName(), board.postNumber);
         }
 

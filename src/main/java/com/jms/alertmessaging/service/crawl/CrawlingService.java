@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface CrawlingService {
 
-    List<Board> crawlFrom(Department department, Integer postNum) throws IOException;
+    List<Board> crawlFrom(Department department, String baseUrl, Integer postNum) throws IOException;
 
 }

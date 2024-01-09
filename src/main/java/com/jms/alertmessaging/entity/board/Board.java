@@ -7,7 +7,7 @@ import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
 @Entity(name = "board")
 @ToString(exclude = "department")
 @NoArgsConstructor

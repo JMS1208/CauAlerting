@@ -21,19 +21,16 @@ import java.util.Objects;
 @Qualifier("bizAdminDepCrawler")
 public final class BizAdminDepCrawler implements WebCrawler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BizAdminDepCrawler.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(BizAdminDepCrawler.class);
 
+    private static String BASE_URL = "://biz.cau.ac.kr/2016/sub06/sub06_01_view.php?bbsIdx=";
     // Department 에 대해서, postNumber 부터 확인
     @Override
-    public List<Board> crawlFrom(Department department, Integer postNum) throws IOException {
+    public List<Board> crawlFrom(Department department, String baseUrl, Integer postNum) throws IOException {
 
-        int postNumber = Objects.isNull(postNum) ? BIZ_ADMIN_INIT_POST_NUM : postNum;
+        int postNumber = postNum;
 
-        String http = "http";
-
-        String https = "https";
-
-        String baseUrl = "://biz.cau.ac.kr/2016/sub06/sub06_01_view.php?bbsIdx=";
+        baseUrl = baseUrl.replace(https, "");
 
         List<Board> boards = new ArrayList<>();
 
@@ -62,7 +59,7 @@ public final class BizAdminDepCrawler implements WebCrawler {
 
             Board board = Board.builder()
                     .postNumber(newPostNum)
-                    .link(https + baseUrl + newPostNum)
+                    .link(https + baseUrl)
                     .writer(null)
                     .title(title)
                     .department(department)
