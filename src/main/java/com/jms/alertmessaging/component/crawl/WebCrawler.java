@@ -14,6 +14,8 @@ public sealed interface WebCrawler permits NurseDepWebCrawler, SoftwareDepWebCra
 
     int NURSE_ADMIN_INIT_POST_NUM = 2552;
 
+    int CRAWL_COUNT = 3;
+
     List<Board> crawlFrom(Department department, Integer postNum) throws IOException;
 
 }

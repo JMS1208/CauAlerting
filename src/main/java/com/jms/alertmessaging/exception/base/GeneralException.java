@@ -1,7 +1,7 @@
 package com.jms.alertmessaging.exception.base;
 
-import com.jms.alertmessaging.data.code.Code;
-import lombok.Getter;
+//import com.jms.alertmessaging.data.code.Code;
+//import lombok.Getter;
 
 //@Getter
 //public class GeneralException extends RuntimeException {

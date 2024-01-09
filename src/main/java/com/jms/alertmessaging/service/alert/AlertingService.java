@@ -22,6 +22,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
@@ -52,12 +54,18 @@ public class AlertingService {
     @Transactional
     public void crawlingAndSendEmail() {
 
-        LocalTime now = LocalTime.now();
-        LocalTime start = LocalTime.of(8,0);
-        LocalTime end = LocalTime.of(23,0);
+        // 한국 시간대로 현재 시간 설정
+        ZonedDateTime nowInKorea = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        // 오전 8시와 밤 11시를 LocalTime으로 설정
+        LocalTime start = LocalTime.of(8, 0);
+        LocalTime end = LocalTime.of(23, 0);
+
+        // 현재 시간이 8시부터 23시 사이인지 확인
+        boolean isWithinRange = nowInKorea.toLocalTime().isAfter(start) && nowInKorea.toLocalTime().isBefore(end);
 
         //오전 8시 ~ 오후 11시까지만 크롤링
-        if(now.isBefore(start) || now.isAfter(end)) {
+        if(!isWithinRange) {
             return;
         }
 
@@ -98,11 +106,11 @@ public class AlertingService {
 
                 //이 학부에 대해서 최근에 크롤링한 게시글이 있다면
                 if(recentBoardsMap.containsKey(department.getId())) {
-                    LOGGER.info("[{}] 최근 크롤링한 것 있음", department.getName());
+                    LOGGER.info("[{}] 이전에 크롤링한 것 있음", department.getName());
                     postNum = recentBoardsMap.get(department.getId()).postNumber+1;
                 }
 
-                LOGGER.info("[포스트 넘버] {}", postNum);
+                LOGGER.info("[크롤링 시작할 포스트 넘버] {}", postNum);
 
                 //새로 크롤링해 온 게시글들
                 List<Board> crawledBoards = crawlingService.crawlFrom(department, postNum);

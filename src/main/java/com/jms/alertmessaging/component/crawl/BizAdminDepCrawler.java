@@ -37,16 +37,20 @@ public final class BizAdminDepCrawler implements WebCrawler {
 
         List<Board> boards = new ArrayList<>();
 
-        while(true) {
-            Document doc = Jsoup.connect(http + baseUrl + postNumber)
+        for(int i = 0; i < CRAWL_COUNT; i++) {
+            int newPostNum = postNumber + i;
+
+            Document doc = Jsoup.connect(http + baseUrl + newPostNum)
                     .get();
+
+            LOGGER.info("[경영 크롤링 시도] : {}", http + baseUrl + newPostNum);
 
             //제목 추출
             Element titleElement = doc.selectFirst(".txt");
 
             String title = titleElement.text();
 
-            if(title.isEmpty()) break;
+            if(title.isEmpty()) continue;
 
             // 날짜 추출
             Element dateElement = doc.selectFirst(".date");
@@ -57,8 +61,8 @@ public final class BizAdminDepCrawler implements WebCrawler {
             LocalDate postAt = LocalDate.parse(date, formatter);
 
             Board board = Board.builder()
-                    .postNumber(postNumber)
-                    .link(https + baseUrl + postNumber)
+                    .postNumber(newPostNum)
+                    .link(https + baseUrl + newPostNum)
                     .writer(null)
                     .title(title)
                     .department(department)
@@ -66,8 +70,6 @@ public final class BizAdminDepCrawler implements WebCrawler {
                     .build();
 
             boards.add(board);
-
-            postNumber++;
         }
 
         return boards;

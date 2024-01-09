@@ -35,18 +35,22 @@ public final class NurseDepWebCrawler implements WebCrawler {
 
         List<Board> boards = new ArrayList<>();
 
-        while(true) {
-            Document doc = Jsoup.connect(http + baseUrl + postNumber)
+        for(int i = 0; i < CRAWL_COUNT; i++) {
+            int newPostNum = postNumber + i;
+
+            Document doc = Jsoup.connect(http + baseUrl + newPostNum)
                     .get();
+
+            LOGGER.info("[간도 크롤링 시도] : {}", http + baseUrl + newPostNum);
 
             // 제목 추출
             Element titleElement = doc.select("td.subject h4").first();
 
-            if(Objects.isNull(titleElement)) break;
+            if(Objects.isNull(titleElement)) continue;
 
             String title = titleElement.text();
 
-            if(title.isEmpty()) break;
+            if(title.isEmpty()) continue;
 
             // 작성자 추출
             Element writerElement = doc.select("th:contains(작성자) + td").first();
@@ -60,8 +64,8 @@ public final class NurseDepWebCrawler implements WebCrawler {
             LOGGER.info("[간호학부] 제목: {}, 작성자: {}, 날짜: {}", title, writer, postAt);
 
             Board board = Board.builder()
-                    .postNumber(postNumber)
-                    .link(https + baseUrl + postNumber)
+                    .postNumber(newPostNum)
+                    .link(https + baseUrl + newPostNum)
                     .writer(writer)
                     .title(title)
                     .department(department)
@@ -69,8 +73,6 @@ public final class NurseDepWebCrawler implements WebCrawler {
                     .build();
 
             boards.add(board);
-
-            postNumber++;
         }
 
         return boards;

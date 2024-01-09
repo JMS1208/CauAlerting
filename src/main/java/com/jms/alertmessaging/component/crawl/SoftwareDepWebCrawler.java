@@ -35,9 +35,13 @@ public final class SoftwareDepWebCrawler implements WebCrawler {
 
         List<Board> boards = new ArrayList<>();
 
-        while(true) {
-            Document doc = Jsoup.connect(http + baseUrl + postNumber)
+        for(int i = 0; i < CRAWL_COUNT; i++) {
+            int newPostNum = postNumber + i;
+
+            Document doc = Jsoup.connect(http + baseUrl + newPostNum)
                     .get();
+
+            LOGGER.info("[소프트 크롤링 시도] : {}", http + baseUrl + newPostNum);
 
             Element titleElement = doc.select("div.header > h3").first();
             Element dateElement = doc.select("div.header span:nth-child(1)").first();
@@ -45,15 +49,15 @@ public final class SoftwareDepWebCrawler implements WebCrawler {
 
             String title = titleElement.text();
 
-            if(title.isEmpty()) break;
+            if(title.isEmpty()) continue;
 
             String writer = authorElement.text();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate postAt = LocalDate.parse(dateElement.text(), formatter);
 
             Board board = Board.builder()
-                    .postNumber(postNumber)
-                    .link(https + baseUrl + postNumber)
+                    .postNumber(newPostNum)
+                    .link(https + baseUrl + newPostNum)
                     .writer(writer)
                     .title(title)
                     .department(department)
@@ -61,8 +65,6 @@ public final class SoftwareDepWebCrawler implements WebCrawler {
                     .build();
 
             boards.add(board);
-
-            postNumber++;
         }
 
         return boards;
