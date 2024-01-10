@@ -6,7 +6,7 @@ import com.jms.alertmessaging.entity.department.Department;
 import java.io.IOException;
 import java.util.List;
 
-public sealed interface WebCrawler permits AdvancedMaterialDepCrawler, ArchiDepCrawler, BizAdminDepCrawler, IntegrativeEngDepCrawler, MachineEngDepCrawler, NurseDepWebCrawler, SoftwareDepWebCrawler {
+public sealed interface WebCrawler permits AdvancedMaterialDepCrawler, ArchiDepCrawler, BizAdminDepCrawler, ChemicalEngDepCrawler, IntegrativeEngDepCrawler, MachineEngDepCrawler, NurseDepWebCrawler, SoftwareDepWebCrawler {
 
     //소프트웨어학부 첫 포스트 넘버
     int SOFT_INIT_POST_NUM = 2812;

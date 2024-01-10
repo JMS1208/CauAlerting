@@ -9,8 +9,7 @@ INSERT INTO department(name) VALUES ('경영학부');
 INSERT INTO department(name) VALUES ('간호학과');
 INSERT INTO department(name) VALUES ('기계공학부');
 INSERT INTO department(name) VALUES ('건축학부');
-INSERT INTO department(name) VALUES ('융합공학부');
-INSERT INTO department(name) VALUES ('첨단소재공학과');
+
 
 INSERT INTO enrollment (student_id, department_id) VALUES (1, 1);
 INSERT INTO enrollment (student_id, department_id) VALUES (1, 2);
@@ -49,6 +48,16 @@ values('2024-01-04', 4648, 4, 'https://me.cau.ac.kr/bbs/board.php?bo_table=sub5_
 
 INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES ('2023-12-08', 1275, 5, 'http://archicau.com/wordpress/공지사항/?mod=document&uid=', '[서울특별시 건축기획과] 서울도시건축전시관 "서울의 내일을 만들다 - 차세대 건축가들의 집단 비전" 전시 개최', '건축학부');
 
+INSERT INTO department(name) VALUES ('융합공학부');
+
 INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES ('2024-01-08', 1489, 6, 'https://ie.cau.ac.kr/sch_5/notice.php?p_mode=view&p_idx=', '2023-2학기 학기별 석차 조회 기간 안내', null);
 
+INSERT INTO department(name) VALUES ('첨단소재공학과');
+
 INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES ('2024-01-08', 289, 7, 'http://ame.cau.ac.kr/bbs/board.php?tbl=bbs45&mode=VIEW&num=', '2024학년도 1학기 재학생 등록기간 안내', '관리자');
+
+
+INSERT INTO department(name) VALUES ('화학신소재공학부');
+
+INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES ('2024-01-05', 256, 8, 'https://chemeng.cau.ac.kr/2018/sub05/sub05_01_view.php?bbsIdx=', '대학원생 학술교류회(가칭 CAU ChemE Symposium) 안내', null);
+
