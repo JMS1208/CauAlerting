@@ -1,6 +1,7 @@
 package com.jms.alertmessaging.service.student;
 
 import com.jms.alertmessaging.dto.student.DepartmentKeywords;
+import com.jms.alertmessaging.dto.student.KeywordDto;
 import com.jms.alertmessaging.dto.student.StudentInfoBundle;
 import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.department.QDepartment;
@@ -177,6 +178,11 @@ public class StudentServiceImpl implements StudentService {
             }
 
         }
+
+    }
+
+    @Override
+    public void updateKeyword(KeywordDto keywordDto) {
 
     }
 }

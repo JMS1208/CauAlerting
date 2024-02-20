@@ -1,16 +1,20 @@
 package com.jms.alertmessaging.controller.api.student;
 
+import com.jms.alertmessaging.dto.student.KeywordDto;
 import com.jms.alertmessaging.dto.student.StudentInfoBundle;
 import com.jms.alertmessaging.dto.student.info.UpdateDepartmentRequest;
+import com.jms.alertmessaging.entity.student.Student;
 import com.jms.alertmessaging.service.auth.AuthService;
 import com.jms.alertmessaging.service.student.StudentService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -18,8 +22,6 @@ public class StudentController {
 
     private final StudentService studentService;
     private final AuthService authService;
-
-    private final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
 
     @GetMapping("/user-info")
     public ResponseEntity<?> getStudentInfo() {
@@ -45,5 +47,13 @@ public class StudentController {
     public ResponseEntity<?> unregister(HttpServletResponse response) {
         authService.deleteUser(response);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/keywords")
+    public ResponseEntity<?> updateKeywords(KeywordDto ) {
+        Student student = authService.getCurrentUser();
+
+        log.info("이메일 = {}", student.getEmail());
+        return ResponseEntity.ok().body(student.getEmail());
     }
 }

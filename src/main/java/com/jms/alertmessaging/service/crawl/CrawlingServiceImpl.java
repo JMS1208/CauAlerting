@@ -41,6 +41,7 @@ public class CrawlingServiceImpl implements CrawlingService {
             case 6 -> context.getBean(IntegrativeEngDepCrawler.class);
             case 7 -> context.getBean(AdvancedMaterialDepCrawler.class);
             case 8 -> context.getBean(ChemicalEngDepCrawler.class);
+            case 9 -> context.getBean(PublicServiceDepCrawler.class);
             default -> throw new IllegalArgumentException("Invalid department ID");
         };
     }

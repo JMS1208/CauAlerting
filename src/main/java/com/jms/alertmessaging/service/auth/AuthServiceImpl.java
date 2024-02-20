@@ -54,6 +54,21 @@ public class AuthServiceImpl implements AuthService {
     private final EnrollmentService enrollmentService;
 
     @Override
+    public Student getCurrentUser() throws AuthenticationException {
+
+        Authentication authentication = getCurrentUserAuthentication();
+
+        Object principal = authentication.getPrincipal();
+
+        if(principal instanceof Student) {
+            return (Student) principal;
+        } else {
+            throw new InvalidAuthenticationException("인증된 유저 정보를 가져오는 데 실패했습니다.");
+        }
+
+    }
+
+    @Override
     public void signIn(String email, String password, HttpServletResponse response) throws SignInFailedException {
         logger.info("[getSignInResult] signDataHandler 로 회원 정보 요청");
 

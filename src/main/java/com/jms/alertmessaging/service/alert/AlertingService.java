@@ -14,13 +14,18 @@ import com.jms.alertmessaging.service.mail.EmailSender;
 import com.jms.alertmessaging.service.crawl.CrawlingService;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.netty.channel.ConnectTimeoutException;
+import io.netty.handler.timeout.ReadTimeoutException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -28,6 +33,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Profile("prod")
 public class AlertingService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AlertingService.class);
@@ -66,11 +72,10 @@ public class AlertingService {
         boolean isWithinRange = nowInKorea.toLocalTime().isAfter(start) && nowInKorea.toLocalTime().isBefore(end);
 
         //오전 8시 ~ 오후 11시까지만 크롤링
-        if(!isWithinRange) {
+        if (!isWithinRange) {
             return;
         }
 
-        try {
             //학부별로 최근에 크롤링한 게시글
 
             List<Board> recentBoards = queryFactory
@@ -88,56 +93,69 @@ public class AlertingService {
 
             LOGGER.info("[최근 크롤링한 학부 수] : {}", recentBoards.size());
 
-            for(Board recentBoard: recentBoards) {
+            for (Board recentBoard : recentBoards) {
 
-                Department department = recentBoard.getDepartment();
-                String baseUrl = recentBoard.getLink();
-                Integer postNum = recentBoard.getPostNumber()+1;
+                try {
+                    Department department = recentBoard.getDepartment();
+                    String baseUrl = recentBoard.getLink();
+                    Integer postNum = recentBoard.getPostNumber() + 1;
 
-                //새로 크롤링해 온 게시글들
-                List<Board> crawledBoards = crawlingService.crawlFrom(department, baseUrl, postNum);
+                    //새로 크롤링해 온 게시글들
+                    List<Board> crawledBoards = crawlingService.crawlFrom(department, baseUrl, postNum);
 
-                LOGGER.info("[크롤링 새로해 온 것] 학부: {}, 개수: {}", department.getName(), crawledBoards.size());
+                    LOGGER.info("[크롤링 새로해 온 것] 학부: {}, 개수: {}", department.getName(), crawledBoards.size());
 
-                if(crawledBoards.isEmpty()) continue;
+                    if (crawledBoards.isEmpty()) continue;
 
-                //새로 크롤링한 것 디비에 저장
-                boardJpaRepository.saveAll(crawledBoards);
+                    //새로 크롤링한 것 디비에 저장
+                    boardJpaRepository.saveAll(crawledBoards);
 
-                //보낼 사람들
-                List<Student> students = queryFactory
-                        .selectFrom(qStudent)
-                        .leftJoin(qStudent.roles)
-                        .join(qStudent.enrollments, qEnrollment)
-                        .join(qEnrollment.department, qDepartment)
-                        .where(qDepartment.id.eq(department.getId()))
-                        .distinct()
-                        .fetch();
+                    //보낼 사람들
+                    List<Student> students = queryFactory
+                            .selectFrom(qStudent)
+                            .leftJoin(qStudent.roles)
+                            .join(qStudent.enrollments, qEnrollment)
+                            .join(qEnrollment.department, qDepartment)
+                            .where(qDepartment.id.eq(department.getId()))
+                            .distinct()
+                            .fetch();
 
-                //보낼 이메일들
-                List<String> sendToEmails = students.stream().map(Student::getEmail).toList();
+                    //보낼 이메일들
+                    List<String> sendToEmails = students.stream().map(Student::getEmail).toList();
 
-                LOGGER.info("[보낼 이메일들] {}", sendToEmails);
+                    LOGGER.info("[보낼 이메일들] {}", sendToEmails);
 
-                if(sendToEmails.isEmpty()) continue;
+                    if (sendToEmails.isEmpty()) continue;
 
-                //이메일 보내기
-                emailSender.sendEmailToPeople(sendToEmails, department.getName() +" 새글 알림", toContent(crawledBoards));
+                    //이메일 보내기
+                    emailSender.sendEmailToPeople(sendToEmails, department.getName() + " 새글 알림", toContent(crawledBoards));
+
+                }  catch (SocketTimeoutException | ConnectException ignored) {
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    emailSender.sendEmailToPerson("wjsalstjr59@gmail.com", "중앙대 알림이 오류 발생", recentBoard.getDepartment().getName()+": " + e);
+                }
 
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            emailSender.sendEmailToPerson("wjsalstjr59@gmail.com", "중앙대 알림이 오류 발생", e.toString());
-        }
     }
 
     private String toContent(List<Board> boards) {
         StringBuilder sb = new StringBuilder();
 
-        for(Board board: boards) {
+        //url로 하나의 게시글에 접근이 불가능한 경우
+        //공공인재학부 - 9
+
+        List<Integer> exclude = List.of(9);
+
+        for (Board board : boards) {
             sb.append("[ ").append(board.title).append("] \n");
-            sb.append("(").append(board.link).append(board.postNumber).append(") \n\n\n");
+            sb.append("(").append(board.link);
+            if (!exclude.contains(board.postNumber)) {
+                sb.append(board.postNumber);
+            }
+            sb.append(") \n\n\n");
         }
 
         return sb.toString();

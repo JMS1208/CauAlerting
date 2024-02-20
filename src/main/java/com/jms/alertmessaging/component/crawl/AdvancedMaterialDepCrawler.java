@@ -125,6 +125,7 @@ public final class AdvancedMaterialDepCrawler implements WebCrawler {
 
             Board board = Board.builder()
                     .postNumber(newPostNum)
+                    .department(department)
                     .link(http + baseUrl)
                     .writer(writer)
                     .title(title)

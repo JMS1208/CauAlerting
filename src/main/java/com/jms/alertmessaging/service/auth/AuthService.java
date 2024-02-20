@@ -1,6 +1,7 @@
 package com.jms.alertmessaging.service.auth;
 
 import com.jms.alertmessaging.dto.auth.sign.check.CheckEmailResponse;
+import com.jms.alertmessaging.entity.student.Student;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 
@@ -8,6 +9,8 @@ import java.util.Date;
 import java.util.Set;
 
 public interface AuthService {
+
+    Student getCurrentUser();
 
     void signIn(String email, String password, HttpServletResponse response) throws RuntimeException;
 

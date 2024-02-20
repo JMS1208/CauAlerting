@@ -25,7 +25,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 @DataJpaTest
-public class StudentService {
+public class StudentServiceTest {
 
     @Autowired
     private StudentJpaRepository studentJpaRepository;
