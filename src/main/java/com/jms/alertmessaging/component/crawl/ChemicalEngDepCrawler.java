@@ -105,6 +105,7 @@ public final class ChemicalEngDepCrawler implements WebCrawler {
                     .link(https + baseUrl)
                     .writer(null)
                     .title(title)
+                    .department(department)
                     .postAt(postAt)
                     .build();
 

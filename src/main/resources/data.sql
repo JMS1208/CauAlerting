@@ -61,3 +61,6 @@ INSERT INTO department(name) VALUES ('화학신소재공학부');
 
 INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES ('2024-01-05', 256, 8, 'https://chemeng.cau.ac.kr/2018/sub05/sub05_01_view.php?bbsIdx=', '대학원생 학술교류회(가칭 CAU ChemE Symposium) 안내', null);
 
+INSERT INTO department(name) VALUES ('공공인재학부');
+
+INSERT INTO board (post_at, post_number, department_id, link, title, writer) VALUES ('2024-01-16', 982, 9, 'https://public.cau.ac.kr/04_pov/pov_01a.php', '	2024-2025 브루나이 정부초청 장학생 선발 안내', null);

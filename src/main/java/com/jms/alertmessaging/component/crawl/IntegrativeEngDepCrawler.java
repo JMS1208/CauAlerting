@@ -116,6 +116,7 @@ public final class IntegrativeEngDepCrawler implements WebCrawler {
                     .writer(null)
                     .title(title)
                     .postAt(postAt)
+                    .department(department)
                     .build();
 
             boards.add(board);

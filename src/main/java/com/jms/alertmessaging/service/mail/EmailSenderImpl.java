@@ -37,9 +37,10 @@ public class EmailSenderImpl implements EmailSender {
 
         SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setTo(addresses.toArray(new String[0]));
+//        message.setTo(addresses.toArray(new String[0]));
         message.setSubject(title);
         message.setText(content);
+        message.setBcc(addresses.toArray(new String[0]));
 
         mailSender.send(message);
     }

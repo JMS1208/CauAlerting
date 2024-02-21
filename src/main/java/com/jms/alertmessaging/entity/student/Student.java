@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,7 +45,7 @@ public class Student implements UserDetails {
     private List<String> roles = new ArrayList<>();
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private Set<Enrollment> enrollments = new HashSet<>();
 
     @Override
@@ -83,4 +83,10 @@ public class Student implements UserDetails {
         return true;
     }
 
+    public void setEnrollments(Collection<Enrollment> enrollments) {
+        this.enrollments = new HashSet<>(enrollments);
+        for(Enrollment enrollment: enrollments) {
+            enrollment.setStudent(this);
+        }
+    }
 }

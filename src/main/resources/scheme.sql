@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS `keywords`
     `enrollment_id` BIGINT       NOT NULL,
     `content`       VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`enrollment_id`) REFERENCES `enrollment` (`id`)
+    FOREIGN KEY (`enrollment_id`) REFERENCES `enrollment` (`id`),
+    UNIQUE (`enrollment_id`, `content`)
 );
 
 CREATE TABLE IF NOT EXISTS `notification`

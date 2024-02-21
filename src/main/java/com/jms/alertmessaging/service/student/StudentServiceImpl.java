@@ -1,6 +1,7 @@
 package com.jms.alertmessaging.service.student;
 
 import com.jms.alertmessaging.dto.student.DepartmentKeywords;
+import com.jms.alertmessaging.dto.student.KeywordDto;
 import com.jms.alertmessaging.dto.student.StudentInfoBundle;
 import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.department.QDepartment;
@@ -21,21 +22,21 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(StudentServiceImpl.class);
 
     private final StudentJpaRepository studentJpaRepository;
     private final DepartmentJpaRepository departmentJpaRepository;
@@ -71,7 +72,7 @@ public class StudentServiceImpl implements StudentService {
 
         String email = authentication.getName();
 
-        LOGGER.info("[findUserBundleByEmail] 이메일은 {}", email);
+        log.info("[findUserBundleByEmail] 이메일은 {}", email);
 
         OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.ASC, qDepartment.id);
 
@@ -98,7 +99,7 @@ public class StudentServiceImpl implements StudentService {
         Map<Long, DepartmentKeywords> departmentKeywordsMap = new TreeMap<>();
 
         for (Tuple result : results) {
-            LOGGER.info("[findUserBundleByEmail] 결과 {}", result);
+            log.info("[findUserBundleByEmail] 결과 {}", result);
             Long departmentId = result.get(qDepartment.id);
             String departmentName = result.get(qDepartment.name);
             String keyword = result.get(qKeyword.content);
@@ -144,7 +145,7 @@ public class StudentServiceImpl implements StudentService {
                 .build();
     }
 
-    @Transactional
+
     @Override
     public void updateMyDepartment(long departmentId, boolean select) {
         Authentication authentication = authService.getCurrentUserAuthentication();
@@ -157,7 +158,7 @@ public class StudentServiceImpl implements StudentService {
 
         Set<Enrollment> enrollments = enrollmentJpaRepository.findByStudentId(student.getId());
 
-        LOGGER.info("[updateMyDepartment]: {}", enrollments);
+        log.info("[updateMyDepartment]: {}", enrollments);
 
         if (select) {
             Department department = departmentJpaRepository.findById(departmentId);
@@ -177,6 +178,79 @@ public class StudentServiceImpl implements StudentService {
             }
 
         }
+
+    }
+
+    /**
+     * 중복된 키워드 저장 X
+     * 키워드 최대 10개
+     * 키워드 글자 제한 10자
+     * 학부마다 설정
+     * 미등록시 모두 공지
+     *
+     * 기존꺼 삭제 -> 추가하기
+     * */
+    @Override
+    public List<String> updateKeyword(KeywordDto keywordDto) {
+        //현재 로그인된 학생 가져와서
+        Student student = authService.getCurrentUser();
+
+        //키워드를 등록할 학부 아이디
+        Long departmentId = keywordDto.getDepartmentId();
+
+        //학생이 등록한 Enrollment 엔티티 가져옴
+        Enrollment enrollment = enrollmentJpaRepository.findByStudentIdAndDepartmentId(student.getId(), departmentId);
+
+        //현재 키워드
+        Set<Keyword> keywords = enrollment.getKeywords();
+
+        //삭제할 키워드
+        Set<Keyword> removeKeywords = new HashSet<>();
+
+        //보존할 키워드
+        Set<Keyword> surviveKeywords = new HashSet<>();
+
+        for(Keyword keyword: keywords) {
+            boolean existed = keywordDto.getKeywords().contains(keyword.getContent());
+
+            //존재하면 보존
+            if(existed) {
+                surviveKeywords.add(keyword);
+            } else {
+            //존재하지 않으면 삭제
+                removeKeywords.add(keyword);
+            }
+
+        }
+
+        Set<Keyword> newKeywords = new HashSet<>();
+
+        //양끝 공백 지운 걸로
+        for(String content: keywordDto.trimKeywords()) {
+            //추가할 키워드인지 검사
+            boolean existed = surviveKeywords.stream().map(Keyword::getContent).toList().contains(content);
+
+            //보존할 곳에 존재하지 않으면 새로 추가할 것
+            if(!existed) {
+                Keyword keyword = new Keyword();
+                keyword.setContent(content);
+                keyword.setEnrollment(enrollment);
+
+                newKeywords.add(keyword);
+            }
+        }
+
+        //삭제할 키워드들 삭제
+        enrollment.removeKeywords(removeKeywords);
+        keywordJpaRepository.deleteAll(removeKeywords);
+
+        //추가할 키워드들 추가
+        enrollment.addKeywords(newKeywords);
+
+        //저장
+        enrollmentJpaRepository.save(enrollment);
+
+        return keywordDto.getKeywords();
 
     }
 }

@@ -3,10 +3,17 @@ package com.jms.alertmessaging.entity.keyword;
 import com.jms.alertmessaging.entity.enrollment.Enrollment;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
-@Data
-@Entity(name = "keywords")
+import java.util.List;
+
+@Getter @Setter
+@Entity
+@Table(name = "keywords", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"enrollment_id", "content"})
+})
 public class Keyword {
 
     @Id
@@ -20,5 +27,8 @@ public class Keyword {
 
     @Column(name = "content")
     private String content;
+
+    public static int MAX_COUNT = 10;
+    public static int MAX_LENGTH = 10;
 
 }

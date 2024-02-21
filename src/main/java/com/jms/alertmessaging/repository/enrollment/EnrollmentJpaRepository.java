@@ -9,5 +9,7 @@ public interface EnrollmentJpaRepository extends JpaRepository<Enrollment, Long>
 //    Set<Enrollment> findByDepartmentIdIn(Set<Long> departmentIds);
 
     Set<Enrollment> findByStudentId(Long studentId);
+
+    Enrollment findByStudentIdAndDepartmentId(Long studentId, Long departmentId);
 }
 
