@@ -9,4 +9,6 @@ public interface KeywordJpaRepository extends JpaRepository<Keyword, Long> {
 
     List<Keyword> findAllByEnrollment_Id(long enrollmentId);
     void deleteAllByEnrollment_Id(long enrollmentId);
+
+    void deleteByEnrollmentIdAndContentEqualsIgnoreCase(long enrollmentId, String content);
 }

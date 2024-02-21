@@ -27,11 +27,7 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         //유저 생성하고
-        Student student = new Student();
-        student.setId(1L);
-        student.setEmail("student@test.com");
-        student.setPassword("123123");
-        student.setRoles(Collections.singletonList("ROLE_USER"));
+        Student student = Student.builder().id(1L).email("student@test.com").password("123123").roles(Collections.singletonList("ROLE_USER")).build();
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(student, null, student.getAuthorities());
 

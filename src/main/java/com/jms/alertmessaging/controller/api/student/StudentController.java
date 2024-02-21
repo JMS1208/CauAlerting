@@ -7,12 +7,15 @@ import com.jms.alertmessaging.entity.student.Student;
 import com.jms.alertmessaging.service.auth.AuthService;
 import com.jms.alertmessaging.service.student.StudentService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,11 +52,9 @@ public class StudentController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/keywords")
-    public ResponseEntity<?> updateKeywords(KeywordDto ) {
-        Student student = authService.getCurrentUser();
-
-        log.info("이메일 = {}", student.getEmail());
-        return ResponseEntity.ok().body(student.getEmail());
+    @PostMapping("/keywords")
+    public ResponseEntity<?> updateKeywords(@RequestBody @Valid KeywordDto keywordDto) {
+        List<String> updatedKeywords = studentService.updateKeyword(keywordDto);
+        return ResponseEntity.ok().body(updatedKeywords);
     }
 }
