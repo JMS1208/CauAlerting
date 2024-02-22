@@ -31,4 +31,14 @@ public class Keyword {
     public static int MAX_COUNT = 10;
     public static int MAX_LENGTH = 10;
 
+    public void setEnrollment(Enrollment enrollment) {
+        if(this.enrollment != null) {
+            this.enrollment.getKeywords().remove(this);
+        }
+        this.enrollment = enrollment;
+        if(enrollment != null) {
+            enrollment.getKeywords().add(this);
+        }
+    }
+
 }
