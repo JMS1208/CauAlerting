@@ -192,53 +192,41 @@ public class StudentServiceImpl implements StudentService {
      * */
     @Override
     public List<String> updateKeyword(KeywordDto keywordDto) {
-        //현재 로그인된 학생 가져와서
+        // 현재 로그인된 학생 가져와서
         Student student = authService.getCurrentUser();
 
-        //키워드를 등록할 학부 아이디
+        // 키워드를 등록할 학부 아이디
         Long departmentId = keywordDto.getDepartmentId();
 
-        //학생이 등록한 Enrollment 엔티티 가져옴
+        // 학생이 등록한 Enrollment 엔티티 가져옴
         Enrollment enrollment = enrollmentJpaRepository.findByStudentIdAndDepartmentId(student.getId(), departmentId);
 
-        //현재 키워드
+        // 현재 키워드
         Set<Keyword> keywords = enrollment.getKeywords();
 
-        //삭제할 키워드
-        Set<Keyword> removeKeywords = new HashSet<>();
+        //업데이트할 키워드 내용들
+        Set<String> updateKeywordContents = new HashSet<>(keywordDto.trimKeywords());
 
-        //보존할 키워드
-        Set<Keyword> surviveKeywords = new HashSet<>();
+        //삭제할 키워드들 - 현재 키워드들 중에 업데이트할 키워드 내용에 없는게 있다면, 삭제
+        Set<Keyword> removeKeywords = keywords.stream()
+                .filter(k -> !updateKeywordContents.contains(k.getContent()))
+                .collect(Collectors.toSet());
 
-        for(Keyword keyword: keywords) {
-            boolean existed = keywordDto.getKeywords().contains(keyword.getContent());
+        //현재 키워드 내용들
+        Set<String> curKeywordContents = keywords.stream()
+                .map(Keyword::getContent)
+                .collect(Collectors.toSet());
 
-            //존재하면 보존
-            if(existed) {
-                surviveKeywords.add(keyword);
-            } else {
-            //존재하지 않으면 삭제
-                removeKeywords.add(keyword);
-            }
-
-        }
-
-        Set<Keyword> newKeywords = new HashSet<>();
-
-        //양끝 공백 지운 걸로
-        for(String content: keywordDto.trimKeywords()) {
-            //추가할 키워드인지 검사
-            boolean existed = surviveKeywords.stream().map(Keyword::getContent).toList().contains(content);
-
-            //보존할 곳에 존재하지 않으면 새로 추가할 것
-            if(!existed) {
-                Keyword keyword = new Keyword();
-                keyword.setContent(content);
-                keyword.setEnrollment(enrollment);
-
-                newKeywords.add(keyword);
-            }
-        }
+        //추가할 키워드들 - 업데이트할 키워드 내용들 중에 현재 키워드에 없으면, 추가
+        Set<Keyword> newKeywords = updateKeywordContents.stream()
+                .filter(k -> !curKeywordContents.contains(k))
+                .map(content -> {
+                    Keyword keyword = new Keyword();
+                    keyword.setContent(content);
+                    keyword.setEnrollment(enrollment);
+                    return keyword;
+                })
+                .collect(Collectors.toSet());
 
         //삭제할 키워드들 삭제
         enrollment.removeKeywords(removeKeywords);
@@ -247,10 +235,7 @@ public class StudentServiceImpl implements StudentService {
         //추가할 키워드들 추가
         enrollment.addKeywords(newKeywords);
 
-        //저장
-        enrollmentJpaRepository.save(enrollment);
-
-        return keywordDto.getKeywords();
-
+        return new ArrayList<>(updateKeywordContents);
     }
+
 }

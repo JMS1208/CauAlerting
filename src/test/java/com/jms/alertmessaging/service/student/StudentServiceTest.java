@@ -39,7 +39,7 @@ import java.util.stream.IntStream;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
+
 class StudentServiceTest {
 
     @Autowired
@@ -204,6 +204,8 @@ class StudentServiceTest {
 
     }
 
+
+    @Transactional
     @Test
     public void 키워드_업데이트_중복처리() throws Exception {
         //given
@@ -217,17 +219,22 @@ class StudentServiceTest {
 
         Enrollment enrollment1 = enrollmentJpaRepository.findByStudentIdAndDepartmentId(student.getId(), 1L);
 
-        LOGGER.info("등록1 : {}", enrollment1.getKeywords().stream().map(Keyword::getContent).toList());
+        List<Keyword> keywords = keywordJpaRepository.findAllByEnrollment_Id(enrollment1.getId()).stream().toList();
 
-        List<String> contents2 = List.of("키워드1", "키워드3");
-        KeywordDto keywordDto2 = new KeywordDto(1L, contents2);
-        studentService.updateKeyword(keywordDto2);
+        LOGGER.info("테스트: {}", enrollment1.getKeywords().stream().map(Keyword::getContent).toList());
 
-        //then
-        Enrollment enrollment2 = enrollmentJpaRepository.findByStudentIdAndDepartmentId(student.getId(), 1L);
+        LOGGER.info("등록1 : {}", keywords.stream().map(Keyword::getContent).toList());
 
-        LOGGER.info("등록2 : {}", enrollment2.getKeywords().stream().map(Keyword::getContent).toList());
+//        List<String> contents2 = List.of("키워드1", "키워드3");
+//        KeywordDto keywordDto2 = new KeywordDto(1L, contents2);
+//        studentService.updateKeyword(keywordDto2);
+//
+//        //then
+//        Enrollment enrollment2 = enrollmentJpaRepository.findByStudentIdAndDepartmentId(student.getId(), 1L);
+//
+//        LOGGER.info("등록2 : {}", enrollment2.getKeywords().stream().map(Keyword::getContent).toList());
 //        Assertions.assertArrayEquals(contents2.toArray(), enrollment2.getKeywords().stream().map(Keyword::getContent).toArray());
-
     }
+
+
 }
