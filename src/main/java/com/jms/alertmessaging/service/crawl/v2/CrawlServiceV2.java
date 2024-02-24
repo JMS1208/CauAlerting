@@ -9,4 +9,5 @@ import java.util.List;
 public interface CrawlServiceV2 {
 
     List<Board> crawlFrom(Department department, String baseUrl, Integer postNumber, Object webCrawler) throws IOException;
+
 }

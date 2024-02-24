@@ -1,4 +1,4 @@
-package com.jms.alertmessaging.service.crawl;
+package com.jms.alertmessaging.service.crawl.v1;
 
 import com.jms.alertmessaging.component.crawl.*;
 import com.jms.alertmessaging.entity.board.Board;
@@ -6,12 +6,10 @@ import com.jms.alertmessaging.entity.department.Department;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 @Service
