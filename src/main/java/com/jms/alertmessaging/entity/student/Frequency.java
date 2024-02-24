@@ -21,4 +21,8 @@ public enum Frequency {
         }
         throw new IllegalArgumentException("Unknown frequency: " + value);
     }
+
+    public static Frequency defaultValue(){
+        return Frequency._2M;
+    }
 }

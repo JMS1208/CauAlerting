@@ -61,14 +61,20 @@ public class SecurityConfig {
 
         //Rest API 기반의 애플리케이션 동작 방식을 설정
         //세션 방식은 쓰지 않기 때문에 STATELESS
+        /*세션으로 관리하는 것과 관리하지 않는 것의 장단점
+        -> 세젼: 서버에서 일일이 관리해야 해서 부하가 있음(뭐를 일일이 관리해야하는지)
+        -> jwt: 상태를 따로 관리하지 않아도 된다.
+        */
         http.sessionManagement(auth -> auth
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
         //api 접근 설정
+        //인증이 필요하지 않는 api 설정 (auth_api) -> DDos에 취약
+        // -> 리캡차로 막아야 함(or cloud 플레어 - ploxy server)
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_URLS).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().authenticated() //그 이외의 요청에는 인증이 필요함(hasrole로 구분지어 허용 시키는 것 가능)
         );
 
         //권한 확인 과정에서 통과하지 못하는 예외가 발생할 때, 예외를 전달

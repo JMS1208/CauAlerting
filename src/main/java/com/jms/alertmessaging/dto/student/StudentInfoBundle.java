@@ -9,7 +9,5 @@ import java.util.List;
 @Builder
 public class StudentInfoBundle {
     private String email;
-
     private List<DepartmentKeywords> departmentKeywordsList;
-
 }

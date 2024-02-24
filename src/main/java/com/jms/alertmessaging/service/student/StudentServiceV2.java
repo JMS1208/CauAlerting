@@ -2,11 +2,12 @@ package com.jms.alertmessaging.service.student;
 
 import com.jms.alertmessaging.dto.student.KeywordDto;
 import com.jms.alertmessaging.dto.student.StudentInfoBundle;
+import com.jms.alertmessaging.entity.student.Frequency;
 import com.jms.alertmessaging.entity.student.Student;
 
 import java.util.List;
 
-public interface StudentService {
+public interface StudentServiceV2 {
 
     void deleteUserById(Long userId);
 
@@ -24,4 +25,5 @@ public interface StudentService {
     //키워드 업데이트
     List<String> updateKeyword(KeywordDto keywordDto);
 
+    public String updateFrequency(Frequency frequency);
 }
