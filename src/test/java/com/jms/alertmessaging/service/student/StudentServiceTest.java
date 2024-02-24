@@ -4,6 +4,7 @@ import com.jms.alertmessaging.dto.student.KeywordDto;
 import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.enrollment.Enrollment;
 import com.jms.alertmessaging.entity.keyword.Keyword;
+import com.jms.alertmessaging.entity.student.Frequency;
 import com.jms.alertmessaging.entity.student.Student;
 import com.jms.alertmessaging.repository.department.DepartmentJpaRepository;
 import com.jms.alertmessaging.repository.enrollment.EnrollmentJpaRepository;
@@ -39,7 +40,7 @@ import java.util.stream.IntStream;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-
+@Transactional
 class StudentServiceTest {
 
     @Autowired
@@ -96,6 +97,7 @@ class StudentServiceTest {
                         .email("test" + i + "@gmail.com")
                         .password(passwordEncoder.encode("123123"))
                         .createdAt(LocalDateTime.now())
+                        .frequency(Frequency._2M)
                         .enrollments(new HashSet<>())
                         .roles(List.of("ROLE_USER"))
                         .build()
@@ -120,7 +122,7 @@ class StudentServiceTest {
         enrollmentJpaRepository.saveAll(enrollments);
     }
 
-    //    @AfterEach
+    @AfterEach
     public void clearData() {
         // 먼저, Enrollment 데이터 삭제
         enrollmentJpaRepository.deleteAll();
@@ -130,6 +132,8 @@ class StudentServiceTest {
 
         // 마지막으로, Department 데이터 삭제
         departmentJpaRepository.deleteAll();
+
+        keywordJpaRepository.deleteAll();
     }
 
     @BeforeEach
@@ -143,6 +147,7 @@ class StudentServiceTest {
                 .id(1L)
                 .email("student@test.com")
                 .password("123123")
+                .frequency(Frequency._2M)
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build();
 
@@ -161,19 +166,6 @@ class StudentServiceTest {
     public void 로그아웃() {
         //테스트 끝난 후, SecurityContext를 클리어
         SecurityContextHolder.clearContext();
-    }
-
-
-    @Test
-    public void 패치_조인() {
-        String email = "test0@gmail.com";
-
-        List<Student> students = studentJpaRepository.findAll();
-
-        students.forEach(student -> {
-            LOGGER.info("[학생]: {}", student.getEnrollments());
-        });
-
     }
 
     @Test

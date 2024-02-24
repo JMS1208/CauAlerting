@@ -48,6 +48,11 @@ public class Student implements UserDetails {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private Set<Enrollment> enrollments = new HashSet<>();
 
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Frequency frequency = Frequency._2M;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
@@ -89,4 +94,5 @@ public class Student implements UserDetails {
             enrollment.setStudent(this);
         }
     }
+
 }
