@@ -187,8 +187,6 @@ class StudentServiceTest {
         studentService.updateKeyword(keywordDto);
 
         //when
-
-
         Set<Enrollment> enrollments = enrollmentJpaRepository.findByStudentId(student.getId());
 
         if(enrollments == null) {
