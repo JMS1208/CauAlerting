@@ -3,28 +3,26 @@ package com.jms.alertmessaging.controller.api.student;
 import com.jms.alertmessaging.dto.student.KeywordDto;
 import com.jms.alertmessaging.dto.student.StudentInfoBundle;
 import com.jms.alertmessaging.dto.student.info.UpdateDepartmentRequest;
-import com.jms.alertmessaging.entity.student.Student;
+import com.jms.alertmessaging.entity.student.Frequency;
 import com.jms.alertmessaging.service.auth.AuthService;
 import com.jms.alertmessaging.service.student.StudentService;
-import com.jms.alertmessaging.service.student.StudentServiceV2;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/apiV2")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-public class StudentController {
+public class StudentControllerV2 {
 
-    private final StudentServiceV2 studentService;
+    private final StudentService studentService;
     private final AuthService authService;
 
     @GetMapping("/user-info")
@@ -59,5 +57,9 @@ public class StudentController {
         return ResponseEntity.ok().body(updatedKeywords);
     }
 
-
+    @PostMapping("/frequency")
+    public ResponseEntity<?> updateFrequency(@RequestBody @Valid Map<String, String> frequencyMap){
+        Frequency frequency = Frequency.fromValue(frequencyMap.get("frequency"));
+        return ResponseEntity.ok().body(frequency);
+    }
 }

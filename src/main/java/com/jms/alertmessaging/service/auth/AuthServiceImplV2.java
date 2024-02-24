@@ -5,6 +5,7 @@ import com.jms.alertmessaging.data.token.Token;
 import com.jms.alertmessaging.dto.auth.sign.check.CheckEmailResponse;
 import com.jms.alertmessaging.entity.department.Department;
 import com.jms.alertmessaging.entity.enrollment.Enrollment;
+import com.jms.alertmessaging.entity.student.Frequency;
 import com.jms.alertmessaging.entity.student.Student;
 import com.jms.alertmessaging.exception.auth.EmailAlreadyUsedException;
 import com.jms.alertmessaging.exception.auth.InvalidAuthenticationException;
@@ -22,7 +23,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -36,12 +36,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@Primary
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImplV2 implements AuthService {
 
-    private final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthServiceImplV2.class);
 
     private final StudentJpaRepository studentJpaRepository;
     private final EnrollmentJpaRepository enrollmentJpaRepository;
@@ -85,6 +84,7 @@ public class AuthServiceImpl implements AuthService {
 
 
         logger.info("[getSignInResult] 패스워드 일치");
+
         logger.info("[getSignInResult] SignInResultDto 객체 생성");
 
         Token accessToken = jwtProvider.createAccessToken(student.getEmail(), student.getRoles());
@@ -118,6 +118,7 @@ public class AuthServiceImpl implements AuthService {
         Student student = Student.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
+                .frequency(Frequency.defaultValue())
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build();
 
@@ -205,6 +206,4 @@ public class AuthServiceImpl implements AuthService {
         int code = random.nextInt(1000000);
         return String.format("%06d", code);
     }
-
-
 }

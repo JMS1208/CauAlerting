@@ -56,7 +56,7 @@ class StudentServiceTest {
     KeywordJpaRepository keywordJpaRepository;
 
     @Autowired
-    StudentService studentService;
+    StudentServiceV2 studentService;
 
     @Autowired
     AuthService authService;
@@ -226,5 +226,14 @@ class StudentServiceTest {
 //        Assertions.assertArrayEquals(contents2.toArray(), enrollment2.getKeywords().stream().map(Keyword::getContent).toArray());
     }
 
+    @Test
+    public void 빈도_변경_테스트() throws Exception{
+        Student student = authService.getCurrentUser();
+        LOGGER.info("학생: {}", student.getFrequency().getValue());
 
+        studentService.updateFrequency(Frequency._10M);
+        studentJpaRepository.save(student);
+
+        Assertions.assertEquals(student.getFrequency(), Frequency._10M);
+    }
 }
